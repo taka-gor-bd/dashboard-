@@ -661,13 +661,7 @@
             color: var(--text-dark);
             margin-bottom: 20px;
         }
-        .activation-popup-content .countdown-display {
-            font-size: 2.2em;
-            font-weight: 700;
-            color: var(--blue-accent);
-            margin: 15px 0;
-        }
-        .activation-popup-content .join-btn,
+        /* No countdown or join button styles needed anymore */
         .activation-popup-content .activate-btn {
             background-color: var(--green-balance);
             color: var(--white);
@@ -681,19 +675,11 @@
             width: 100%;
             box-sizing: border-box;
             display: block;
-            text-decoration: none;
             text-align: center;
+            opacity: 1; /* Always active */
+            pointer-events: auto; /* Always clickable */
+            margin-top: 0; /* No space needed if no join button */
         }
-        .activation-popup-content .activate-btn {
-            opacity: 0.5;
-            pointer-events: none;
-            margin-top: 10px; /* Space between join and activate */
-        }
-        .activation-popup-content .activate-btn.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .activation-popup-content .join-btn:hover,
         .activation-popup-content .activate-btn:hover {
             background-color: #27ae60;
         }
@@ -964,12 +950,8 @@
         <div class="activation-popup-content">
             <i class="fas fa-times close-popup-btn" onclick="hideActivationPopup()"></i>
             <h4>আপনার আইডি অ্যাক্টিভ করুন</h4>
-            <p class="message">মাইনিং এবং টাস্ক চালু করতে, আমাদের টেলিগ্রাম চ্যানেলে জয়েন হয়ে আইডি অ্যাক্টিভ করুন:</p>
-            <a href="https://t.me/your_telegram_channel" target="_blank" class="join-btn" id="joinTelegramBtn" onclick="handleTelegramJoin()">
-                টেলিগ্রাম চ্যানেলে জয়েন করুন
-            </a>
-            <div class="countdown-display" id="activationCountdown" style="display:none;"></div>
-            <button class="activate-btn" id="activateIdBtn" disabled onclick="activateUser()">
+            <p class="message">মাইনিং এবং টাস্ক চালু করতে, আপনার আইডি অ্যাক্টিভ করুন:</p>
+            <button class="activate-btn" id="activateIdBtn" onclick="activateUser()">
                 অ্যাক্টিভ করুন
             </button>
         </div>
@@ -1007,7 +989,6 @@
         const taskTimers = {}; // To store intervals for task cooldowns
 
         let activationPopupInterval; // For recurring activation popup
-        let activationCountdownInterval; // For the specific 5-second activation countdown
 
         // --- Firebase Authentication State Change ---
         onAuthStateChanged(auth, (user) => {
@@ -1259,346 +1240,4 @@
 
                     alert(`রেফার কোড "${referrerCode}" সফলভাবে সাবমিট করা হয়েছে!\nআপনার মাইনিং স্পিড ১% বৃদ্ধি পেয়েছে!`);
                     referrerCodeInput.value = ''; // Clear input
-                    updateReferralSectionVisibility(); // Hide submit section
-                } else {
-                    alert('রেফার কোডটি ভুল বা বিদ্যমান নয়।');
-                }
-            } catch (error) {
-                console.error("রেফার কোড সাবমিট ব্যর্থ:", error);
-                alert('রেফার কোড সাবমিট করতে সমস্যা হয়েছে।');
-            }
-        }
-
-        function updateReferralSectionVisibility() {
-            if (userData.referredBy) {
-                document.getElementById('referralSubmitSection').style.display = 'none';
-                document.getElementById('referralHistorySection').style.display = 'block';
-            } else {
-                document.getElementById('referralSubmitSection').style.display = 'block';
-                document.getElementById('referralHistorySection').style.display = 'none';
-            }
-        }
-
-        function showReferralHistory() {
-            showSection('referralDetailsSection');
-            // In a real app, you would fetch referral history from Firebase here.
-            // This would likely be a list of users who used *this* user's referralCode.
-            // This also usually requires a backend query/function for efficiency and security.
-        }
-
-        function hideReferralHistory() {
-            showSection('mainContent');
-        }
-        
-        // --- Settings Section Logic ---
-        function loadSettings() {
-            document.getElementById('userNameInput').value = userData.name || '';
-            document.getElementById('userNumberInput').value = userData.number || '';
-        }
-
-        async function saveSettings() {
-            if (!currentUser) return;
-
-            const name = document.getElementById('userNameInput').value.trim();
-            const number = document.getElementById('userNumberInput').value.trim();
-
-            if (!name) {
-                alert('অনুগ্রহ করে আপনার নাম লিখুন।');
-                return;
-            }
-
-            try {
-                const userRef = ref(database, 'users/' + currentUser.uid);
-                await update(userRef, {
-                    name: name,
-                    number: number
-                });
-                userData.name = name; // Update local state
-                userData.number = number; // Update local state
-                alert('সেটিংস সফলভাবে সেভ করা হয়েছে!');
-                updateUI(); // Refresh UI to show updated name
-                hideSettings();
-            } catch (error) {
-                console.error("সেটিংস সেভ করতে ব্যর্থ:", error);
-                alert('সেটিংস সেভ করতে সমস্যা হয়েছে।');
-            }
-        }
-
-        function showSettings() {
-            showSection('settingsSection');
-            loadSettings(); // Load current settings when section is shown
-        }
-
-        function hideSettings() {
-            showSection('mainContent');
-        }
-
-        // --- Task Management Logic ---
-        function initializeTaskStates() {
-            document.querySelectorAll('.task-item-card').forEach(card => {
-                const taskId = card.dataset.taskId;
-                const taskFirebaseState = userData.tasks?.[taskId] || { lastClaimTime: 0 }; // Default to 0 if not exists
-                const lastClaimTime = taskFirebaseState.lastClaimTime || 0;
-
-                const now = Date.now();
-                const timeElapsed = now - lastClaimTime;
-
-                clearInterval(taskTimers[taskId]); // Clear existing timer if any
-
-                if (timeElapsed < taskClaimCooldown) {
-                    showTaskBlockedState(card, taskId, timeElapsed);
-                } else {
-                    showTaskInitialState(card);
-                }
-                card.onclick = (event) => startTask(event);
-            });
-        }
-
-        function showTaskInitialState(card) {
-            card.classList.remove('disabled');
-            card.querySelector('.task-content-initial').style.display = 'flex';
-            card.querySelector('.task-content-active').style.display = 'none';
-            card.querySelector('.task-content-blocked').style.display = 'none';
-        }
-
-        function showTaskActiveState(card) {
-            card.classList.remove('disabled');
-            card.querySelector('.task-content-initial').style.display = 'none';
-            card.querySelector('.task-content-active').style.display = 'flex';
-            card.querySelector('.task-content-blocked').style.display = 'none';
-        }
-
-        function showTaskBlockedState(card, taskId, timeElapsedMs) {
-            card.classList.add('disabled');
-            card.querySelector('.task-content-initial').style.display = 'none';
-            card.querySelector('.task-content-active').style.display = 'none';
-            card.querySelector('.task-content-blocked').style.display = 'flex';
-
-            const blockedTimerDisplay = card.querySelector('.blocked-timer');
-            const updateBlockedTimer = () => {
-                const remainingTime = taskClaimCooldown - timeElapsedMs;
-                if (remainingTime <= 0) {
-                    clearInterval(taskTimers[taskId]);
-                    delete userData.tasks[taskId].lastClaimTime; // Can clean up in Firebase if needed
-                    showTaskInitialState(card);
-                } else {
-                    blockedTimerDisplay.innerText = formatTime(remainingTime);
-                }
-                timeElapsedMs += 1000; // Manually advance for display, actual time from Date.now()
-            };
-            
-            clearInterval(taskTimers[taskId]); // Clear existing interval if any
-            taskTimers[taskId] = setInterval(updateBlockedTimer, 1000);
-            updateBlockedTimer(); // Call immediately
-        }
-
-
-        async function startTask(event) {
-            if (!currentUser || !userData.isActivated) {
-                showActivationPopup();
-                return;
-            }
-
-            const clickedCard = event.currentTarget;
-            const taskId = clickedCard.dataset.taskId;
-            const taskReward = parseFloat(clickedCard.dataset.taskReward);
-            const taskUrl = clickedCard.dataset.taskUrl;
-
-            // Check if on cooldown from Firebase data
-            const lastClaimTime = userData.tasks?.[taskId]?.lastClaimTime || 0;
-            const now = Date.now();
-            const timeElapsed = now - lastClaimTime;
-
-            if (timeElapsed < taskClaimCooldown) {
-                alert('এই টাস্কটি এখনো ক্লেইম করার জন্য প্রস্তুত নয়।');
-                showTaskBlockedState(clickedCard, taskId, timeElapsed);
-                return;
-            }
-            
-            // Redirect to link
-            window.open(taskUrl, '_blank'); // Open in new tab
-            
-            // Simulate user returning after delay
-            // In a real app, you would need server-side verification or deep linking to confirm return.
-            setTimeout(() => {
-                showTaskActiveState(clickedCard); // Show timer and claim button
-
-                const timerDisplay = clickedCard.querySelector('.task-timer-display');
-                const claimButton = clickedCard.querySelector('.task-claim-btn');
-
-                let countdownTime = 5; // Task timer duration (5 seconds)
-                timerDisplay.innerText = countdownTime;
-                claimButton.disabled = true;
-                claimButton.classList.remove('active');
-
-                const taskTimerInterval = setInterval(() => {
-                    countdownTime--;
-                    timerDisplay.innerText = countdownTime;
-                    if (countdownTime <= 0) {
-                        clearInterval(taskTimerInterval);
-                        timerDisplay.innerText = '0';
-                        claimButton.disabled = false;
-                        claimButton.classList.add('active');
-                        claimButton.onclick = () => claimTask(clickedCard, taskId, taskReward);
-                    }
-                }, 1000);
-            }, 3000); // Simulate 3 seconds for user to visit and come back
-        }
-
-        async function claimTask(card, taskId, reward) {
-            if (!currentUser) return;
-
-            const userRef = ref(database, 'users/' + currentUser.uid);
-            const newBalance = parseFloat((userData.balance + reward).toFixed(2));
-            const newLastClaimTime = Date.now();
-
-            try {
-                await update(userRef, {
-                    balance: newBalance,
-                    [`tasks/${taskId}/lastClaimTime`]: newLastClaimTime
-                });
-                userData.balance = newBalance; // Update local state
-                if (!userData.tasks) userData.tasks = {}; // Ensure tasks object exists
-                userData.tasks[taskId] = { lastClaimTime: newLastClaimTime }; // Update local state
-
-                alert(`অভিনন্দন! আপনি ৳ ${reward.toFixed(2)} পেয়েছেন!`);
-                showTaskBlockedState(card, taskId, 0); // Show blocked state immediately
-            } catch (error) {
-                console.error("টাস্ক ক্লেম করতে ব্যর্থ:", error);
-                alert('টাস্ক ক্লেম করতে সমস্যা হয়েছে।');
-            }
-        }
-
-        // --- User Activation Logic ---
-
-        // Function to start or resume the activation countdown
-        function startActivationCountdown() {
-            document.getElementById('joinTelegramBtn').style.display = 'none';
-            document.getElementById('activationCountdown').style.display = 'block';
-            document.getElementById('activateIdBtn').style.display = 'block'; // Show activate button but disabled
-            document.getElementById('activateIdBtn').disabled = true;
-            document.getElementById('activateIdBtn').classList.remove('active');
-
-            // Clear any existing countdown to prevent multiple timers
-            clearInterval(activationCountdownInterval);
-
-            let activationCountdownTime = 5; // 5 seconds countdown
-            const countdownDisplay = document.getElementById('activationCountdown');
-            countdownDisplay.innerText = activationCountdownTime;
-
-            activationCountdownInterval = setInterval(() => {
-                activationCountdownTime--;
-                countdownDisplay.innerText = activationCountdownTime;
-                if (activationCountdownTime <= 0) {
-                    clearInterval(activationCountdownInterval);
-                    countdownDisplay.innerText = '০'; // Display 0 when done
-                    document.getElementById('activateIdBtn').disabled = false;
-                    document.getElementById('activateIdBtn').classList.add('active');
-                }
-            }, 1000);
-        }
-
-        // Modify handleTelegramJoin
-        async function handleTelegramJoin() {
-            // Open Telegram link in a new tab
-            window.open('https://t.me/your_telegram_channel', '_blank');
-
-            // Update Firebase to mark that user has initiated the Telegram join process
-            if (currentUser) {
-                const userRef = ref(database, 'users/' + currentUser.uid);
-                try {
-                    await update(userRef, { hasJoinedTelegram: true });
-                    userData.hasJoinedTelegram = true; // Update local state immediately
-                } catch (error) {
-                    console.error("Failed to update hasJoinedTelegram in Firebase:", error);
-                    // Continue even if Firebase update fails, but log it
-                }
-            }
-            // Start the countdown immediately on the current page
-            startActivationCountdown();
-        }
-
-
-        function checkUserActivationStatus() {
-            if (userData.isActivated) {
-                document.getElementById('verifiedTick').classList.add('active');
-                hideActivationPopup(); // Ensure popup is hidden if activated
-                clearInterval(activationPopupInterval); // Stop recurring popup if user activates
-            } else {
-                document.getElementById('verifiedTick').classList.remove('active');
-                // If user is not activated but has initiated Telegram join process
-                if (userData.hasJoinedTelegram) {
-                    showActivationPopup(); // Show popup
-                    startActivationCountdown(); // Immediately start countdown
-                } else {
-                    // User not activated and has not initiated Telegram join
-                    // Only show the popup if it's not already visible.
-                    // This prevents showing it repeatedly if user closes it without action.
-                    if (document.getElementById('activationPopup').style.display !== 'flex') {
-                        showActivationPopup();
-                    }
-                    // Ensure the join button is visible and activate button is hidden/disabled
-                    document.getElementById('joinTelegramBtn').style.display = 'block';
-                    document.getElementById('activationCountdown').style.display = 'none';
-                    document.getElementById('activateIdBtn').style.display = 'none';
-                }
-                startRecurringActivationPopup(); // Start recurring popup if not activated
-            }
-        }
-
-        function showActivationPopup() {
-            document.getElementById('activationPopup').style.display = 'flex';
-            // This function will be called by checkUserActivationStatus, which sets the correct display states for buttons/countdown.
-            // So, no explicit display changes here, let checkUserActivationStatus handle it.
-        }
-
-        function hideActivationPopup() {
-            document.getElementById('activationPopup').style.display = 'none';
-            clearInterval(activationCountdownInterval); // Also clear activation specific countdown
-            if (userData.isActivated) {
-                clearInterval(activationPopupInterval); // Stop recurring popup if user activates
-            }
-        }
-
-        async function activateUser() {
-            if (!currentUser) return;
-
-            const userRef = ref(database, 'users/' + currentUser.uid);
-            try {
-                await update(userRef, { isActivated: true });
-                userData.isActivated = true; // Update local state
-                alert('আপনার আইডি সফলভাবে অ্যাক্টিভ করা হয়েছে! এখন আপনি মাইনিং এবং টাস্কগুলো ব্যবহার করতে পারবেন।');
-                hideActivationPopup(); // Hide popup immediately after activation
-                checkUserActivationStatus(); // This will also clear recurring interval
-            } catch (error) {
-                console.error("অ্যাক্টিভেশন ব্যর্থ:", error);
-                alert('অ্যাক্টিভেশন করতে সমস্যা হয়েছে।');
-            }
-        }
-
-        function startRecurringActivationPopup() {
-            if (activationPopupInterval) {
-                clearInterval(activationPopupInterval);
-            }
-            activationPopupInterval = setInterval(() => {
-                if (currentUser && !userData.isActivated && document.getElementById('activationPopup').style.display !== 'flex') {
-                    showActivationPopup();
-                }
-            }, 30 * 1000); // Every 30 seconds
-        }
-
-        // --- Logout ---
-        window.logoutUser = async function() {
-            try {
-                await signOut(auth);
-                // The onAuthStateChanged listener will handle redirection to registration.html
-            } catch (error) {
-                console.error("লগ আউট ব্যর্থ:", error);
-                alert("লগ আউট করতে সমস্যা হয়েছে।");
-            }
-        };
-
-        // Initial calls are handled by onAuthStateChanged listener
-    </script>
-</body>
-</html>
+                    updateReferralSectionVisibility
