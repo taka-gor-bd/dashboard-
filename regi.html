@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taka GhorBD - Login / Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #FF0000;
+            --white: #ffffff;
+            --neutral-bg: #f0f2f5;
+            --border-color-light: #e6edf5;
+            --text-dark: #333d47;
+            --shadow-card: 0 6px 15px rgba(0, 0, 0, 0.08);
+            --border-radius-main: 15px;
+            --border-radius-card: 10px;
+            --border-radius-small: 6px;
+            --success-green: #2ecc71;
+            --error-red: #e74c3c;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
+            background-color: var(--neutral-bg);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            font-size: 0.95em;
+        }
+
+        .auth-container {
+            background-color: var(--white);
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-card);
+            width: 100%;
+            max-width: 380px;
+            padding: 30px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .logo {
+            color: var(--primary-red);
+            font-size: 2em;
+            font-weight: 800;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: var(--text-dark);
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid var(--border-color-light);
+            border-radius: var(--border-radius-small);
+            font-size: 0.9em;
+            color: var(--text-dark);
+        }
+
+        .auth-button {
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: var(--border-radius-small);
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 15px;
+        }
+
+        .auth-button:hover {
+            background-color: #cc0000;
+        }
+
+        .toggle-form-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .toggle-form-link:hover {
+            color: var(--primary-red);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: var(--border-radius-small);
+            font-size: 0.85em;
+            font-weight: 500;
+            display: none; /* Hidden by default */
+        }
+
+        .message.success {
+            background-color: #e6f7ee;
+            color: var(--success-green);
+            border: 1px solid var(--success-green);
+        }
+
+        .message.error {
+            background-color: #fce7e7;
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <span class="logo">Taka GhorBD</span>
+        <h2 id="formTitle">রেজিস্ট্রেশন করুন</h2>
+
+        <div id="registerForm">
+            <div class="form-group">
+                <label for="regName">আপনার নাম:</label>
+                <input type="text" id="regName" placeholder="নাম লিখুন" required>
+            </div>
+            <div class="form-group">
+                <label for="regNumber">ফোন নাম্বার:</label>
+                <input type="tel" id="regNumber" placeholder="ফোন নাম্বার লিখুন" required>
+            </div>
+            <div class="form-group">
+                <label for="regEmail">ইমেইল:</label>
+                <input type="email" id="regEmail" placeholder="ইমেইল লিখুন" required>
+            </div>
+            <div class="form-group">
+                <label for="regPassword">পাসওয়ার্ড:</label>
+                <input type="password" id="regPassword" placeholder="পাসওয়ার্ড লিখুন" required>
+            </div>
+             <div class="form-group">
+                <label for="regReferralCode">রেফার কোড (ঐচ্ছিক):</label>
+                <input type="text" id="regReferralCode" placeholder="রেফার কোড লিখুন">
+            </div>
+            <button class="auth-button" onclick="registerUser()">রেজিস্টার করুন</button>
+            <span class="toggle-form-link" onclick="toggleForm()">আপনার অ্যাকাউন্ট আছে? লগইন করুন।</span>
+        </div>
+
+        <div id="loginForm" style="display:none;">
+            <div class="form-group">
+                <label for="loginEmail">ইমেইল:</label>
+                <input type="email" id="loginEmail" placeholder="ইমেইল লিখুন" required>
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">পাসওয়ার্ড:</label>
+                <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড লিখুন" required>
+            </div>
+            <button class="auth-button" onclick="loginUser()">লগইন করুন</button>
+            <span class="toggle-form-link" onclick="toggleForm()">অ্যাকাউন্ট নেই? রেজিস্ট্রেশন করুন।</span>
+        </div>
+
+        <div class="message" id="authMessage"></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyA0nwj-qooOderNiLvmILB-gIPouy2HG4c",
+          authDomain: "takagorbd.firebaseapp.com",
+          databaseURL: "https://takagorbd-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "takagorbd",
+          storageBucket: "takagorbd.firebasestorage.app",
+          messagingSenderId: "531548262665",
+          appId: "1:531548262665:web:85fb34ea635dae7ddc43d8",
+          measurementId: "G-TZB0NHKYGY"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Export Firebase instances for global access if needed, or pass them
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDatabase = database;
+
+        const authMessage = document.getElementById('authMessage');
+
+        function showMessage(msg, type) {
+            authMessage.innerText = msg;
+            authMessage.className = `message ${type}`;
+            authMessage.style.display = 'block';
+        }
+
+        // Toggle between Registration and Login forms
+        window.toggleForm = function() {
+            const registerForm = document.getElementById('registerForm');
+            const loginForm = document.getElementById('loginForm');
+            const formTitle = document.getElementById('formTitle');
+
+            if (registerForm.style.display === 'none') {
+                registerForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                formTitle.innerText = 'রেজিস্ট্রেশন করুন';
+            } else {
+                registerForm.style.display = 'none';
+                loginForm.style.display = 'block';
+                formTitle.innerText = 'লগইন করুন';
+            }
+            authMessage.style.display = 'none'; // Clear message on toggle
+        };
+
+        // User Registration
+        window.registerUser = async function() {
+            const name = document.getElementById('regName').value.trim();
+            const number = document.getElementById('regNumber').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const referralCode = document.getElementById('regReferralCode').value.trim();
+
+            if (!name || !number || !email || !password) {
+                showMessage('সবগুলো ঘর পূরণ করুন।', 'error');
+                return;
+            }
+
+            try {
+                // 1. Create user with Email and Password
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Save additional user data to Realtime Database
+                const userId = user.uid;
+                const userRef = ref(database, 'users/' + userId);
+
+                // Initial user data
+                const initialUserData = {
+                    name: name,
+                    number: number,
+                    email: email,
+                    balance: 0.00,
+                    miningSpeed: 0.0001, // Default mining speed
+                    isActivated: false,
+                    referralCode: generateReferralCode(userId), // Generate a unique referral code for this user
+                    referredBy: referralCode || null, // Store who referred this user
+                    tasks: { // Initial task states
+                        telegram: { lastClaimTime: 0 },
+                        youtube: { lastClaimTime: 0 },
+                        facebook: { lastClaimTime: 0 },
+                        website: { lastClaimTime: 0 }
+                    },
+                    lastMiningTime: 0 // Unix timestamp
+                };
+
+                await set(userRef, initialUserData);
+
+                // 3. If a referral code was used, potentially update the referrer's data (requires backend for secure boosts)
+                if (referralCode) {
+                    const referrerQuery = await get(ref(database, 'users'));
+                    let referrerId = null;
+                    referrerQuery.forEach(childSnapshot => {
+                        if (childSnapshot.val().referralCode === referralCode) {
+                            referrerId = childSnapshot.key;
+                        }
+                    });
+
+                    if (referrerId) {
+                        // In a real application, the referrer's boost would be applied via a secure server function,
+                        // not directly from the client. For this demo, we can log it.
+                        console.log(`User ${userId} was referred by ${referrerId} using code ${referralCode}`);
+                        showMessage('রেজিস্ট্রেশন সফল হয়েছে! রেফার কোড ব্যবহৃত হয়েছে।', 'success');
+                        // Backend would handle adding boost to referrer's miningSpeed
+                    } else {
+                        showMessage('রেজিস্ট্রেশন সফল হয়েছে! রেফার কোডটি ভুল বা বিদ্যমান নয়।', 'success');
+                    }
+                } else {
+                     showMessage('রেজিস্ট্রেশন সফল হয়েছে! আপনি এখন লগইন করতে পারবেন।', 'success');
+                }
+                
+                // Clear form fields
+                document.getElementById('regName').value = '';
+                document.getElementById('regNumber').value = '';
+                document.getElementById('regEmail').value = '';
+                document.getElementById('regPassword').value = '';
+                document.getElementById('regReferralCode').value = '';
+
+                // Automatically redirect to home.html after a short delay
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 2000);
+
+            } catch (error) {
+                console.error("রেজিস্ট্রেশন ব্যর্থ:", error);
+                let errorMessage = 'রেজিস্ট্রেশন ব্যর্থ হয়েছে।';
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'এই ইমেইলটি ইতিমধ্যেই ব্যবহৃত হয়েছে।';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'ইমেইল ফরম্যাট সঠিক নয়।';
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'পাসওয়ার্ডটি কমপক্ষে ৬ অক্ষরের হতে হবে।';
+                }
+                showMessage(errorMessage, 'error');
+            }
+        };
+
+        // User Login
+        window.loginUser = async function() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showMessage('ইমেইল এবং পাসওয়ার্ড লিখুন।', 'error');
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showMessage('লগইন সফল হয়েছে!', 'success');
+                // Redirect to home.html
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 1000);
+
+            } catch (error) {
+                console.error("লগইন ব্যর্থ:", error);
+                let errorMessage = 'লগইন ব্যর্থ হয়েছে।';
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    errorMessage = 'ভুল ইমেইল বা পাসওয়ার্ড।';
+                } else if (error.code === 'auth/invalid-credential') {
+                    errorMessage = 'ভুল ইমেইল বা পাসওয়ার্ড।';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'ইমেইল ফরম্যাট সঠিক নয়।';
+                }
+                showMessage(errorMessage, 'error');
+            }
+        };
+
+        // Function to generate a unique referral code (client-side simple example)
+        function generateReferralCode(uid) {
+            // Use part of UID for uniqueness, append a short random string
+            const shortUid = uid.substring(0, 8).toUpperCase();
+            const randomSuffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+            return `TG-${shortUid}-${randomSuffix}`;
+        }
+    </script>
+</body>
+</html>
