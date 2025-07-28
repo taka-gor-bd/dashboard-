@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taka GhorBD - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Bengali:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-red: #FF0000;
+            --white: #ffffff;
+            --light-bg: #f9fbfd;
+            --neutral-bg: #f0f2f5;
+            --border-color-light: #e6edf5;
+            --text-dark: #333d47;
+            --text-light: #6a737d;
+            --green-balance: #2ecc71;
+            --blue-accent: #3498db;
+            --shadow-subtle: 0 2px 5px rgba(0, 0, 0, 0.04);
+            --shadow-card: 0 6px 15px rgba(0, 0, 0, 0.08);
+            --border-radius-main: 15px;
+            --border-radius-card: 10px;
+            --border-radius-small: 6px;
+        }
+
+        body {
+            font-family: 'Inter', 'Noto Sans Bengali', sans-serif;
+            background-color: var(--neutral-bg);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 10px;
+            box-sizing: border-box;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-size: 0.9em;
+        }
+
+        .dashboard-container {
+            background-color: var(--white);
+            border-radius: var(--border-radius-main);
+            box-shadow: var(--shadow-card);
+            width: 100%;
+            max-width: 380px;
+            padding: 0;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .top-nav {
+            background-color: var(--white);
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color-light);
+            box-shadow: var(--shadow-subtle);
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        .top-nav .logo {
+            color: var(--primary-red);
+            font-size: 1.4em;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .menu-icon {
+            font-size: 1.4em;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+
+        .menu-icon:hover {
+            color: var(--primary-red);
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -220px;
+            width: 220px;
+            height: 100%;
+            background-color: var(--white);
+            box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
+            transition: right 0.3s ease-in-out;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            padding-top: 50px;
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.6em;
+            color: var(--text-dark);
+            cursor: pointer;
+            z-index: 101;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 15px;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 12px;
+        }
+
+        .sidebar-menu a {
+            text-decoration: none;
+            color: var(--text-dark);
+            font-size: 1em;
+            font-weight: 500;
+            display: block;
+            padding: 8px 12px;
+            border-radius: var(--border-radius-small);
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .sidebar-menu a i {
+            margin-right: 10px;
+            color: var(--primary-red);
+        }
+
+        .main-content {
+            padding: 15px;
+        }
+
+        .user-balance-card {
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius-card);
+            box-shadow: var(--shadow-subtle);
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color-light);
+            text-align: center;
+        }
+
+        .profile-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color-light);
+            justify-content: flex-start;
+            text-align: left;
+        }
+
+        .profile-icon-large {
+            width: 35px;
+            height: 35px;
+            background-color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4em;
+            color: var(--text-dark);
+            border: 1px solid var(--border-color-light);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .user-name-verified {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .verified-tick {
+            color: var(--blue-accent);
+            font-size: 0.8em;
+            display: none;
+        }
+        .verified-tick.active {
+            display: inline-block;
+        }
+
+        .balance-display-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .current-balance {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--green-balance);
+            margin-bottom: 3px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .live-balance-update {
+            font-size: 0.9em;
+        }
+
+        .mining-status-text {
+            font-size: 0.8em;
+            color: var(--text-light);
+            margin-top: 12px;
+            font-weight: 500;
+        }
+
+        .start-mining-btn {
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-small);
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 95%;
+            max-width: 250px;
+            margin: 15px auto 0 auto; /* Centering the button */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .start-mining-btn:hover {
+            background-color: #cc0000;
+            transform: translateY(-2px);
+        }
+        .start-mining-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Referral Section */
+        .referral-card {
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius-card);
+            box-shadow: var(--shadow-subtle);
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color-light);
+        }
+
+        .referral-card h3 {
+            font-size: 1.2em;
+            color: var(--primary-red);
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .referral-code-display {
+            background-color: var(--white);
+            border: 1px dashed var(--blue-accent);
+            border-radius: var(--border-radius-small);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            font-family: 'Inter', monospace;
+            color: var(--text-dark);
+            font-weight: 500;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        .copy-referral-btn {
+            background-color: var(--blue-accent);
+            color: var(--white);
+            border: none;
+            padding: 7px 12px;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            font-size: 0.8em;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .copy-referral-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Referral Submit & History */
+        .referral-submit-section, .referral-history-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color-light);
+        }
+        .referral-submit-section h4, .referral-history-section h4 {
+            font-size: 1.1em;
+            color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+        .referral-submit-section input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color-light);
+            border-radius: var(--border-radius-small);
+            font-size: 0.9em;
+        }
+        .submit-referral-btn {
+            background-color: var(--primary-red);
+            color: var(--white);
+            border: none;
+            padding: 8px 15px;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        .submit-referral-btn:hover {
+            background-color: #cc0000;
+        }
+        .referral-history-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        .referral-history-section li {
+            background-color: var(--white);
+            border: 1px solid var(--border-color-light);
+            border-radius: var(--border-radius-small);
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        .referral-history-section li span.balance {
+            font-weight: 600;
+            color: var(--green-balance);
+        }
+
+        /* Tasks Section */
+        .tasks-section {
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius-card);
+            box-shadow: var(--shadow-subtle);
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color-light);
+        }
+
+        .tasks-section h3 {
+            font-size: 1.2em;
+            color: var(--primary-red);
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .task-item-card {
+            background-color: var(--white);
+            border-radius: var(--border-radius-card);
+            border: 1px solid var(--border-color-light);
+            box-shadow: var(--shadow-subtle);
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+            justify-content: center;
+        }
+
+        .task-item-card:hover:not(.disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .task-item-card.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #e0e0e0;
+        }
+        .task-item-card.disabled .task-icon {
+            color: #999;
+        }
+
+        .task-content-initial {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .task-content-active {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+        }
+        .task-content-blocked { /* New style for 24-hour block */
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+            font-size: 0.8em;
+            color: var(--text-light);
+            text-align: center;
+        }
+        .task-content-blocked .blocked-icon {
+            font-size: 1.8em;
+            color: var(--primary-red);
+        }
+        .task-content-blocked .blocked-text {
+            font-weight: 600;
+        }
+
+
+        .task-icon {
+            font-size: 1.8em;
+            color: var(--blue-accent);
+        }
+
+        .task-item-card h4 {
+            margin: 0;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .task-reward {
+            font-size: 0.8em;
+            font-weight: 700;
+            color: var(--green-balance);
+        }
+
+        .task-timer-display {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--blue-accent);
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .task-claim-btn {
+            background-color: var(--green-balance);
+            color: var(--white);
+            border: none;
+            padding: 8px 15px;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .task-claim-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .task-claim-btn:hover {
+            background-color: #27ae60;
+        }
+
+        /* Copy Success Pop-up */
+        .copy-success-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .copy-success-popup-content {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: var(--border-radius-card);
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            position: relative;
+            width: 90%;
+            max-width: 300px;
+            animation: fadeInScale 0.3s ease-out;
+            border: 2px solid var(--blue-accent);
+        }
+
+        .copy-success-popup-content .close-popup-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2em;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .copy-success-popup-content .close-popup-btn:hover {
+            color: var(--primary-red);
+        }
+
+        .copy-success-popup-content i {
+            font-size: 2.5em;
+            color: var(--green-balance);
+            margin-bottom: 15px;
+        }
+
+        .copy-success-popup-content h4 {
+            font-size: 1.1em;
+            color: var(--text-dark);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* Settings Section */
+        .settings-section {
+            display: none;
+            background-color: var(--light-bg);
+            border-radius: var(--border-radius-card);
+            box-shadow: var(--shadow-subtle);
+            padding: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color-light);
+            text-align: center;
+        }
+        .settings-section h3 {
+            font-size: 1.2em;
+            color: var(--primary-red);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        .settings-section .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .settings-section label {
+            display: block;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+        .settings-section input[type="text"],
+        .settings-section input[type="tel"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid var(--border-color-light);
+            border-radius: var(--border-radius-small);
+            font-size: 0.9em;
+        }
+        .settings-section .save-settings-btn {
+            background-color: var(--blue-accent);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-small);
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        .settings-section .save-settings-btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Activation Pop-up */
+        .activation-popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            justify-content: center;
+            align-items: center;
+            z-index: 250; /* Ensure it's on top */
+        }
+
+        .activation-popup-content {
+            background-color: var(--white);
+            padding: 25px;
+            border-radius: var(--border-radius-card);
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            position: relative;
+            width: 90%;
+            max-width: 320px;
+            animation: fadeInScale 0.3s ease-out;
+            border: 2px solid var(--primary-red);
+        }
+        .activation-popup-content .close-popup-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.2em;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .activation-popup-content .close-popup-btn:hover {
+            color: var(--primary-red);
+        }
+
+        .activation-popup-content h4 {
+            font-size: 1.3em;
+            color: var(--primary-red);
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .activation-popup-content .message {
+            font-size: 0.9em;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+        .activation-popup-content .countdown-display {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--blue-accent);
+            margin: 15px 0;
+        }
+        .activation-popup-content .join-btn,
+        .activation-popup-content .activate-btn {
+            background-color: var(--green-balance);
+            color: var(--white);
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--border-radius-small);
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+            display: block;
+            text-decoration: none;
+            text-align: center;
+        }
+        .activation-popup-content .activate-btn {
+            opacity: 0.5;
+            pointer-events: none;
+            margin-top: 10px; /* Space between join and activate */
+        }
+        .activation-popup-content .activate-btn.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .activation-popup-content .join-btn:hover,
+        .activation-popup-content .activate-btn:hover {
+            background-color: #27ae60;
+        }
+
+
+        /* Media Queries */
+        @media (min-width: 601px) {
+            body {
+                padding: 20px;
+                font-size: 1em;
+            }
+            .dashboard-container {
+                max-width: 420px;
+            }
+            .top-nav {
+                padding: 15px 20px;
+            }
+            .top-nav .logo {
+                font-size: 1.6em;
+            }
+            .menu-icon {
+                font-size: 1.6em;
+            }
+            .main-content {
+                padding: 20px;
+            }
+            .user-balance-card {
+                padding: 20px;
+            }
+            .profile-info {
+                margin-bottom: 18px;
+                padding-bottom: 15px;
+            }
+            .profile-icon-large {
+                width: 40px;
+                height: 40px;
+                font-size: 1.6em;
+            }
+            .user-name-verified {
+                font-size: 1em;
+            }
+            .current-balance {
+                font-size: 3em;
+            }
+            .live-balance-update {
+                font-size: 1em;
+            }
+            .mining-status-text {
+                font-size: 0.9em;
+            }
+            .start-mining-btn {
+                padding: 12px 25px;
+                font-size: 1.05em;
+                max-width: 280px;
+            }
+            .referral-card, .tasks-section {
+                padding: 20px;
+            }
+            .referral-card h3, .tasks-section h3 {
+                font-size: 1.3em;
+            }
+            .referral-code-display {
+                flex-direction: row;
+                justify-content: space-between;
+                font-size: 0.95em;
+            }
+            .copy-referral-btn {
+                font-size: 0.85em;
+            }
+            .task-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .task-icon {
+                font-size: 2.2em;
+            }
+            .task-item-card h4 {
+                font-size: 0.95em;
+            }
+            .task-reward {
+                font-size: 0.85em;
+            }
+            .copy-success-popup-content i {
+                font-size: 3em;
+            }
+            .copy-success-popup-content h4 {
+                font-size: 1.2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="top-nav">
+            <a href="#" class="logo">Taka GhorBD</a>
+            <i class="fas fa-bars menu-icon" id="menuIcon"></i>
+        </div>
+
+        <div class="main-content" id="mainContent">
+            <div class="user-balance-card">
+                <div class="profile-info">
+                    <div class="profile-icon-large">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name-verified">
+                            <span id="displayUserName">ব্যবহারকারীর নাম লোড হচ্ছে...</span> <i class="fas fa-check-circle verified-tick" id="verifiedTick"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="balance-display-area">
+                    <div class="current-balance">
+                        ৳ <span id="mainBalanceDisplay">0.00</span>
+                    </div>
+                    <div class="live-balance-update">
+                        <small>লাইভ:</small> <span>৳ <span id="liveBalanceCounter">0.00000</span></span>
+                    </div>
+                </div>
+
+                <div class="mining-status-text" id="miningStatus">মাইনিং বন্ধ আছে। ২৪ ঘন্টা পর আবার চালু করুন।</div>
+                <button class="start-mining-btn" id="startMiningButton" onclick="startMining()">
+                    <i class="fas fa-play-circle"></i> মাইনিং শুরু করুন
+                </button>
+            </div>
+
+            <div class="referral-card">
+                <h3>আপনার রেফার কোড</h3>
+                <div class="referral-code-display">
+                    <span id="referralCode">লোড হচ্ছে...</span>
+                    <button class="copy-referral-btn" onclick="copyReferralCode()"><i class="fas fa-copy"></i> কপি করুন</button>
+                </div>
+
+                <div class="referral-submit-section" id="referralSubmitSection">
+                    <h4>রেফার কোড সাবমিট করুন</h4>
+                    <input type="text" id="referrerCodeInput" placeholder="এখানে রেফার কোড লিখুন">
+                    <button class="submit-referral-btn" onclick="submitReferralCode()">সাবমিট করুন</button>
+                </div>
+
+                <div class="referral-history-section" id="referralHistorySection" style="display:none;">
+                    <button class="submit-referral-btn" onclick="showReferralHistory()">রেফার হিস্টরি <i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+
+            <div class="tasks-section">
+                <h3>আজকের কাজগুলো</h3>
+                <div class="task-grid">
+                    <div class="task-item-card" data-task-id="telegram" data-task-reward="2" data-task-url="https://web.telegram.org/">
+                        <div class="task-content-initial">
+                            <i class="fab fa-telegram-plane task-icon"></i>
+                            <h4>টেলিগ্রাম টাস্ক</h4>
+                            <span class="task-reward">৳ 2.00</span>
+                        </div>
+                        <div class="task-content-active">
+                            <div class="task-timer-display"></div>
+                            <button class="task-claim-btn" disabled>ক্লেম করুন</button>
+                        </div>
+                        <div class="task-content-blocked">
+                            <i class="fas fa-clock blocked-icon"></i>
+                            <span class="blocked-text">পুনরায় শুরু হবে:</span>
+                            <span class="blocked-timer"></span>
+                        </div>
+                    </div>
+                    <div class="task-item-card" data-task-id="youtube" data-task-reward="2" data-task-url="https://www.youtube.com/">
+                        <div class="task-content-initial">
+                            <i class="fab fa-youtube task-icon"></i>
+                            <h4>ইউটিউব টাস্ক</h4>
+                            <span class="task-reward">৳ 2.00</span>
+                        </div>
+                        <div class="task-content-active">
+                            <div class="task-timer-display"></div>
+                            <button class="task-claim-btn" disabled>ক্লেম করুন</button>
+                        </div>
+                        <div class="task-content-blocked">
+                            <i class="fas fa-clock blocked-icon"></i>
+                            <span class="blocked-text">পুনরায় শুরু হবে:</span>
+                            <span class="blocked-timer"></span>
+                        </div>
+                    </div>
+                    <div class="task-item-card" data-task-id="facebook" data-task-reward="2" data-task-url="https://www.facebook.com/">
+                        <div class="task-content-initial">
+                            <i class="fab fa-facebook-f task-icon"></i>
+                            <h4>ফেসবুক টাস্ক</h4>
+                            <span class="task-reward">৳ 2.00</span>
+                        </div>
+                        <div class="task-content-active">
+                            <div class="task-timer-display"></div>
+                            <button class="task-claim-btn" disabled>ক্লেম করুন</button>
+                        </div>
+                        <div class="task-content-blocked">
+                            <i class="fas fa-clock blocked-icon"></i>
+                            <span class="blocked-text">পুনরায় শুরু হবে:</span>
+                            <span class="blocked-timer"></span>
+                        </div>
+                    </div>
+                    <div class="task-item-card" data-task-id="website" data-task-reward="2" data-task-url="https://www.google.com/">
+                        <div class="task-content-initial">
+                            <i class="fas fa-globe task-icon"></i>
+                            <h4>ওয়েবসাইট ভিজিট</h4>
+                            <span class="task-reward">৳ 2.00</span>
+                        </div>
+                        <div class="task-content-active">
+                            <div class="task-timer-display"></div>
+                            <button class="task-claim-btn" disabled>ক্লেম করুন</button>
+                        </div>
+                        <div class="task-content-blocked">
+                            <i class="fas fa-clock blocked-icon"></i>
+                            <span class="blocked-text">পুনরায় শুরু হবে:</span>
+                            <span class="blocked-timer"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content" id="referralDetailsSection" style="display:none;">
+            <div class="referral-card">
+                <button class="submit-referral-btn" onclick="hideReferralHistory()"> <i class="fas fa-chevron-left"></i> ড্যাশবোর্ডে ফিরে যান</button>
+                <h3 style="margin-top: 20px;">আপনার রেফারেল তালিকা</h3>
+                <ul id="referralList">
+                    <li>রেফারেল ইউজার ১ <span class="balance">৳ 15.00</span></li>
+                    <li>রেফারেল ইউজার ২ <span class="balance">৳ 10.50</span></li>
+                </ul>
+                <p style="font-size:0.85em; color:var(--text-light); margin-top:15px;">
+                    এটি একটি ডেমো তালিকা। আসল ডেটা পেতে আপনার অ্যাপের সার্ভার-সাইড প্রয়োজন হবে।
+                </p>
+            </div>
+        </div>
+
+        <div class="main-content" id="settingsSection" style="display:none;">
+            <div class="settings-section">
+                <button class="submit-referral-btn" onclick="hideSettings()"> <i class="fas fa-chevron-left"></i> ড্যাশবোর্ডে ফিরে যান</button>
+                <h3 style="margin-top: 20px;">সেটিংস</h3>
+                <div class="input-group">
+                    <label for="userNameInput">প্রোফাইল নাম:</label>
+                    <input type="text" id="userNameInput" placeholder="আপনার নাম">
+                </div>
+                <div class="input-group">
+                    <label for="userNumberInput">ফোন নাম্বার:</label>
+                    <input type="tel" id="userNumberInput" placeholder="আপনার ফোন নাম্বার">
+                </div>
+                <button class="save-settings-btn" onclick="saveSettings()">সেভ করুন</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <i class="fas fa-times close-btn" id="closeSidebarBtn"></i>
+        <ul class="sidebar-menu">
+            <li><a href="#" onclick="showSection('mainContent')"><i class="fas fa-home"></i> হোম</a></li>
+            <li><a href="#" onclick="showSection('settingsSection')"><i class="fas fa-cog"></i> সেটিংস</a></li>
+            <li><a href="#"><i class="fas fa-user-circle"></i> ইউজার প্রোফাইল</a></li>
+            <li><a href="#"><i class="fas fa-shield-alt"></i> প্রাইভেসি পলিসি</a></li>
+            <li><a href="#"><i class="fas fa-info-circle"></i> আমাদের সম্পর্কে</a></li>
+            <li><a href="#"><i class="fas fa-question-circle"></i> সাহায্য</a></li>
+            <li><a href="#" onclick="logoutUser()"><i class="fas fa-sign-out-alt"></i> লগ আউট</a></li>
+        </ul>
+    </div>
+
+    <div class="copy-success-popup-overlay" id="copySuccessPopup">
+        <div class="copy-success-popup-content">
+            <i class="fas fa-times close-popup-btn" onclick="hideCopySuccessPopup()"></i>
+            <i class="fas fa-check-circle"></i>
+            <h4>রেফার কোড সফলভাবে কপি করা হয়েছে!</h4>
+        </div>
+    </div>
+
+    <div class="activation-popup-overlay" id="activationPopup">
+        <div class="activation-popup-content">
+            <i class="fas fa-times close-popup-btn" onclick="hideActivationPopup()"></i>
+            <h4>আপনার আইডি অ্যাক্টিভ করুন</h4>
+            <p class="message">মাইনিং এবং টাস্ক চালু করতে, আমাদের টেলিগ্রাম চ্যানেলে জয়েন হয়ে আইডি অ্যাক্টিভ করুন:</p>
+            <a href="https://t.me/your_telegram_channel" target="_blank" class="join-btn" id="joinTelegramBtn" onclick="handleTelegramJoin()">
+                টেলিগ্রাম চ্যানেলে জয়েন করুন
+            </a>
+            <div class="countdown-display" id="activationCountdown" style="display:none;"></div>
+            <button class="activate-btn" id="activateIdBtn" disabled onclick="activateUser()">
+                অ্যাক্টিভ করুন
+            </button>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getDatabase, ref, onValue, set, update, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyA0nwj-qooOderNiLvmILB-gIPouy2HG4c",
+          authDomain: "takagorbd.firebaseapp.com",
+          databaseURL: "https://takagorbd-default-rtdb.asia-southeast1.firebasedatabase.app",
+          projectId: "takagorbd",
+          storageBucket: "takagorbd.firebasestorage.app",
+          messagingSenderId: "531548262665",
+          appId: "1:531548262665:web:85fb34ea635dae7ddc43d8",
+          measurementId: "G-TZB0NHKYGY"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Global variables for user data and intervals
+        let currentUser = null;
+        let userData = {}; // Stores all user data from Firebase
+        let miningInterval;
+        const miningDuration = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        const taskClaimCooldown = 24 * 60 * 60 * 1000; // 24 hours cooldown for tasks
+        const taskTimers = {}; // To store intervals for task cooldowns
+
+        let activationPopupInterval; // For recurring activation popup
+        let activationCountdownInterval; // For the specific 5-second activation countdown
+
+        // --- Firebase Authentication State Change ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                const userRef = ref(database, 'users/' + currentUser.uid);
+
+                // Listen for real-time updates to user data
+                onValue(userRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        userData = snapshot.val();
+                        console.log("User data loaded from Firebase:", userData);
+                        updateUI(); // Update all UI elements based on loaded data
+                        checkMiningStatusOnLoad(); // Check and resume mining if active
+                        initializeTaskStates(); // Initialize tasks based on Firebase data
+                        checkUserActivationStatus(); // Check activation status
+                    } else {
+                        console.error("User data not found in database for UID:", currentUser.uid);
+                        logoutUser(); // Log out if data somehow doesn't exist for authenticated user
+                    }
+                });
+            } else {
+                // User is signed out, redirect to login page
+                currentUser = null;
+                console.log("User not logged in. Redirecting to registration page.");
+                window.location.href = 'registration.html';
+            }
+        });
+
+        // --- UI Update Functions ---
+        function updateUI() {
+            document.getElementById('displayUserName').innerText = userData.name || 'ব্যবহারকারীর নাম';
+            document.getElementById('mainBalanceDisplay').innerText = (userData.balance || 0).toFixed(2);
+            document.getElementById('liveBalanceCounter').innerText = (userData.balance || 0).toFixed(5); // Live counter often shows more decimals
+            document.getElementById('referralCode').innerText = userData.referralCode || 'লোড হচ্ছে...';
+            document.getElementById('userNameInput').value = userData.name || '';
+            document.getElementById('userNumberInput').value = userData.number || '';
+            
+            // Update verified tick based on activation status
+            if (userData.isActivated) {
+                document.getElementById('verifiedTick').classList.add('active');
+            } else {
+                document.getElementById('verifiedTick').classList.remove('active');
+            }
+
+            updateReferralSectionVisibility(); // Show/hide referral submit/history
+            // Mining status will be updated by checkMiningStatusOnLoad
+        }
+
+        // Function to format time for display (HH:MM:SS)
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+
+            return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        // --- Mining Logic ---
+        async function updateMiningBalance() {
+            if (!currentUser || !userData.miningSpeed) return;
+
+            userData.balance = parseFloat((userData.balance + userData.miningSpeed).toFixed(5)); // Add mining speed to balance
+            document.getElementById('mainBalanceDisplay').innerText = userData.balance.toFixed(2);
+            document.getElementById('liveBalanceCounter').innerText = userData.balance.toFixed(5);
+            
+            // Update balance in Firebase
+            const userRef = ref(database, 'users/' + currentUser.uid);
+            await update(userRef, { balance: userData.balance });
+        }
+
+        function updateMiningTimerDisplay() {
+            if (!userData.lastMiningTime) return;
+
+            const now = Date.now();
+            const timeElapsed = now - userData.lastMiningTime;
+            const remainingTime = miningDuration - timeElapsed;
+
+            if (remainingTime <= 0) {
+                stopMining();
+                alert('আপনার ২৪ ঘন্টার মাইনিং সেশন শেষ হয়েছে! আবার চালু করুন।');
+                document.getElementById('miningStatus').innerText = 'মাইনিং বন্ধ আছে। ২৪ ঘন্টা পর আবার চালু করুন।';
+            } else {
+                document.getElementById('startMiningButton').innerHTML = `${formatTime(remainingTime)}`;
+                document.getElementById('miningStatus').innerText = 'মাইনিং সক্রিয় আছে।';
+            }
+        }
+
+        async function startMining() {
+            if (!userData.isActivated) {
+                showActivationPopup();
+                return;
+            }
+            if (miningInterval) return; // Prevent multiple intervals
+
+            const userRef = ref(database, 'users/' + currentUser.uid);
+            const now = Date.now();
+
+            await update(userRef, { lastMiningTime: now });
+            userData.lastMiningTime = now; // Update local data immediately
+
+            document.getElementById('startMiningButton').disabled = true;
+            document.getElementById('startMiningButton').classList.add('mining-active');
+            
+            miningInterval = setInterval(updateMiningBalance, 1000);
+            setInterval(updateMiningTimerDisplay, 1000); // Only one timer display update needed
+
+            updateMiningTimerDisplay(); // Call immediately to show timer
+
+            // Set a timeout to stop mining after 24 hours
+            setTimeout(async () => {
+                if (miningInterval) { // Check if it's still running
+                    stopMining();
+                    alert('আপনার ২৪ ঘন্টার মাইনিং সেশন শেষ হয়েছে! আবার শুরু করতে পারেন।');
+                }
+            }, miningDuration);
+        }
+
+        async function stopMining() {
+            clearInterval(miningInterval);
+            miningInterval = null; // Clear the interval reference
+
+            document.getElementById('startMiningButton').disabled = false;
+            document.getElementById('startMiningButton').innerHTML = '<i class="fas fa-play-circle"></i> মাইনিং শুরু করুন';
+            document.getElementById('startMiningButton').classList.remove('mining-active');
+            document.getElementById('miningStatus').innerText = 'মাইনিং বন্ধ আছে। ২৪ ঘন্টা পর আবার চালু করুন।';
+
+            // Reset lastMiningTime in Firebase to indicate stopped
+            if (currentUser) {
+                const userRef = ref(database, 'users/' + currentUser.uid);
+                await update(userRef, { lastMiningTime: 0 }); // Use 0 or null to indicate not mining
+            }
+        }
+
+        function checkMiningStatusOnLoad() {
+            if (userData.lastMiningTime && userData.lastMiningTime > 0) {
+                const now = Date.now();
+                const timeElapsed = now - userData.lastMiningTime;
+
+                if (timeElapsed < miningDuration) {
+                    // Mining is still active, resume for remaining time
+                    const remainingTime = miningDuration - timeElapsed;
+                    
+                    // Calculate and add balance for offline duration
+                    const offlineDurationSeconds = Math.floor(timeElapsed / 1000);
+                    userData.balance = parseFloat((userData.balance + (offlineDurationSeconds * userData.miningSpeed)).toFixed(5));
+                    
+                    updateUI(); // Update UI with potentially increased balance from offline mining
+                    startMining(); // Restart mining countdown and updates
+                } else {
+                    // Mining session has ended while offline
+                    stopMining();
+                }
+            } else {
+                 // Mining was explicitly stopped or never started
+                 stopMining(); // Ensure UI reflects stopped state
+            }
+        }
+
+        // --- Sidebar & Section Management ---
+        document.getElementById('menuIcon').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.add('active');
+        });
+
+        document.getElementById('closeSidebarBtn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('active');
+        });
+
+        function showSection(sectionId) {
+            const sections = ['mainContent', 'referralDetailsSection', 'settingsSection'];
+            sections.forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+            document.getElementById('sidebar').classList.remove('active'); // Close sidebar after selection
+        }
+
+        // --- Referral Logic ---
+        function copyReferralCode() {
+            const referralCode = document.getElementById('referralCode').innerText;
+            if (referralCode === 'লোড হচ্ছে...') {
+                alert('রেফার কোড এখনো লোড হয়নি।');
+                return;
+            }
+            navigator.clipboard.writeText(referralCode).then(() => {
+                showCopySuccessPopup();
+            }).catch(err => {
+                console.error('কপি করতে ব্যর্থ:', err);
+                alert('রেফার কোড কপি করতে ব্যর্থ হয়েছে।');
+            });
+        }
+
+        function showCopySuccessPopup() {
+            document.getElementById('copySuccessPopup').style.display = 'flex';
+        }
+
+        function hideCopySuccessPopup() {
+            document.getElementById('copySuccessPopup').style.display = 'none';
+        }
+
+        async function submitReferralCode() {
+            if (!currentUser) return; // Must be logged in
+
+            const referrerCodeInput = document.getElementById('referrerCodeInput');
+            const referrerCode = referrerCodeInput.value.trim();
+
+            if (referrerCode === '') {
+                alert('অনুগ্রহ করে একটি রেফার কোড লিখুন।');
+                return;
+            }
+            if (referrerCode === userData.referralCode) {
+                alert('আপনি আপনার নিজের রেফার কোড ব্যবহার করতে পারবেন না!');
+                return;
+            }
+            if (userData.referredBy) {
+                alert('আপনি ইতিমধ্যেই একটি রেফার কোড ব্যবহার করেছেন।');
+                return;
+            }
+
+            try {
+                // Find the referrer by their code
+                const usersRef = ref(database, 'users');
+                const snapshot = await get(usersRef);
+                let referrerFound = false;
+                let referrerUID = null;
+
+                snapshot.forEach(childSnapshot => {
+                    if (childSnapshot.val().referralCode === referrerCode) {
+                        referrerFound = true;
+                        referrerUID = childSnapshot.key;
+                        return true; // Break loop
+                    }
+                });
+
+                if (referrerFound && referrerUID) {
+                    // Update current user's referredBy status
+                    const userRef = ref(database, 'users/' + currentUser.uid);
+                    await update(userRef, { referredBy: referrerCode });
+                    userData.referredBy = referrerCode; // Update local state
+
+                    // Apply boost to the current user (the one who submitted the code)
+                    // As requested, this demo applies the boost to the submitting user directly.
+                    // For the *referrer* (the one who owned the code) to get a boost,
+                    // a secure Firebase Cloud Function or a backend server would be required
+                    // to update their miningSpeed, as client-side code cannot securely modify other users' data.
+                    userData.miningSpeed = parseFloat((userData.miningSpeed * 1.01).toFixed(5)); // 1% boost
+                    await update(userRef, { miningSpeed: userData.miningSpeed });
+
+                    alert(`রেফার কোড "${referrerCode}" সফলভাবে সাবমিট করা হয়েছে!\nআপনার মাইনিং স্পিড ১% বৃদ্ধি পেয়েছে!`);
+                    referrerCodeInput.value = ''; // Clear input
+                    updateReferralSectionVisibility(); // Hide submit section
+                } else {
+                    alert('রেফার কোডটি ভুল বা বিদ্যমান নয়।');
+                }
+            } catch (error) {
+                console.error("রেফার কোড সাবমিট ব্যর্থ:", error);
+                alert('রেফার কোড সাবমিট করতে সমস্যা হয়েছে।');
+            }
+        }
+
+        function updateReferralSectionVisibility() {
+            if (userData.referredBy) {
+                document.getElementById('referralSubmitSection').style.display = 'none';
+                document.getElementById('referralHistorySection').style.display = 'block';
+            } else {
+                document.getElementById('referralSubmitSection').style.display = 'block';
+                document.getElementById('referralHistorySection').style.display = 'none';
+            }
+        }
+
+        function showReferralHistory() {
+            showSection('referralDetailsSection');
+            // In a real app, you would fetch referral history from Firebase here.
+            // This would likely be a list of users who used *this* user's referralCode.
+            // This also usually requires a backend query/function for efficiency and security.
+        }
+
+        function hideReferralHistory() {
+            showSection('mainContent');
+        }
+        
+        // --- Settings Section Logic ---
+        function loadSettings() {
+            document.getElementById('userNameInput').value = userData.name || '';
+            document.getElementById('userNumberInput').value = userData.number || '';
+        }
+
+        async function saveSettings() {
+            if (!currentUser) return;
+
+            const name = document.getElementById('userNameInput').value.trim();
+            const number = document.getElementById('userNumberInput').value.trim();
+
+            if (!name) {
+                alert('অনুগ্রহ করে আপনার নাম লিখুন।');
+                return;
+            }
+
+            try {
+                const userRef = ref(database, 'users/' + currentUser.uid);
+                await update(userRef, {
+                    name: name,
+                    number: number
+                });
+                userData.name = name; // Update local state
+                userData.number = number; // Update local state
+                alert('সেটিংস সফলভাবে সেভ করা হয়েছে!');
+                updateUI(); // Refresh UI to show updated name
+                hideSettings();
+            } catch (error) {
+                console.error("সেটিংস সেভ করতে ব্যর্থ:", error);
+                alert('সেটিংস সেভ করতে সমস্যা হয়েছে।');
+            }
+        }
+
+        function showSettings() {
+            showSection('settingsSection');
+            loadSettings(); // Load current settings when section is shown
+        }
+
+        function hideSettings() {
+            showSection('mainContent');
+        }
+
+        // --- Task Management Logic ---
+        function initializeTaskStates() {
+            document.querySelectorAll('.task-item-card').forEach(card => {
+                const taskId = card.dataset.taskId;
+                const taskFirebaseState = userData.tasks?.[taskId] || { lastClaimTime: 0 }; // Default to 0 if not exists
+                const lastClaimTime = taskFirebaseState.lastClaimTime || 0;
+
+                const now = Date.now();
+                const timeElapsed = now - lastClaimTime;
+
+                clearInterval(taskTimers[taskId]); // Clear existing timer if any
+
+                if (timeElapsed < taskClaimCooldown) {
+                    showTaskBlockedState(card, taskId, timeElapsed);
+                } else {
+                    showTaskInitialState(card);
+                }
+                card.onclick = (event) => startTask(event);
+            });
+        }
+
+        function showTaskInitialState(card) {
+            card.classList.remove('disabled');
+            card.querySelector('.task-content-initial').style.display = 'flex';
+            card.querySelector('.task-content-active').style.display = 'none';
+            card.querySelector('.task-content-blocked').style.display = 'none';
+        }
+
+        function showTaskActiveState(card) {
+            card.classList.remove('disabled');
+            card.querySelector('.task-content-initial').style.display = 'none';
+            card.querySelector('.task-content-active').style.display = 'flex';
+            card.querySelector('.task-content-blocked').style.display = 'none';
+        }
+
+        function showTaskBlockedState(card, taskId, timeElapsedMs) {
+            card.classList.add('disabled');
+            card.querySelector('.task-content-initial').style.display = 'none';
+            card.querySelector('.task-content-active').style.display = 'none';
+            card.querySelector('.task-content-blocked').style.display = 'flex';
+
+            const blockedTimerDisplay = card.querySelector('.blocked-timer');
+            const updateBlockedTimer = () => {
+                const remainingTime = taskClaimCooldown - timeElapsedMs;
+                if (remainingTime <= 0) {
+                    clearInterval(taskTimers[taskId]);
+                    delete userData.tasks[taskId].lastClaimTime; // Can clean up in Firebase if needed
+                    showTaskInitialState(card);
+                } else {
+                    blockedTimerDisplay.innerText = formatTime(remainingTime);
+                }
+                timeElapsedMs += 1000; // Manually advance for display, actual time from Date.now()
+            };
+            
+            clearInterval(taskTimers[taskId]); // Clear existing interval if any
+            taskTimers[taskId] = setInterval(updateBlockedTimer, 1000);
+            updateBlockedTimer(); // Call immediately
+        }
+
+
+        async function startTask(event) {
+            if (!currentUser || !userData.isActivated) {
+                showActivationPopup();
+                return;
+            }
+
+            const clickedCard = event.currentTarget;
+            const taskId = clickedCard.dataset.taskId;
+            const taskReward = parseFloat(clickedCard.dataset.taskReward);
+            const taskUrl = clickedCard.dataset.taskUrl;
+
+            // Check if on cooldown from Firebase data
+            const lastClaimTime = userData.tasks?.[taskId]?.lastClaimTime || 0;
+            const now = Date.now();
+            const timeElapsed = now - lastClaimTime;
+
+            if (timeElapsed < taskClaimCooldown) {
+                alert('এই টাস্কটি এখনো ক্লেইম করার জন্য প্রস্তুত নয়।');
+                showTaskBlockedState(clickedCard, taskId, timeElapsed);
+                return;
+            }
+            
+            // Redirect to link
+            window.open(taskUrl, '_blank'); // Open in new tab
+            
+            // Simulate user returning after delay
+            // In a real app, you would need server-side verification or deep linking to confirm return.
+            setTimeout(() => {
+                showTaskActiveState(clickedCard); // Show timer and claim button
+
+                const timerDisplay = clickedCard.querySelector('.task-timer-display');
+                const claimButton = clickedCard.querySelector('.task-claim-btn');
+
+                let countdownTime = 5; // Task timer duration (5 seconds)
+                timerDisplay.innerText = countdownTime;
+                claimButton.disabled = true;
+                claimButton.classList.remove('active');
+
+                const taskTimerInterval = setInterval(() => {
+                    countdownTime--;
+                    timerDisplay.innerText = countdownTime;
+                    if (countdownTime <= 0) {
+                        clearInterval(taskTimerInterval);
+                        timerDisplay.innerText = '0';
+                        claimButton.disabled = false;
+                        claimButton.classList.add('active');
+                        claimButton.onclick = () => claimTask(clickedCard, taskId, taskReward);
+                    }
+                }, 1000);
+            }, 3000); // Simulate 3 seconds for user to visit and come back
+        }
+
+        async function claimTask(card, taskId, reward) {
+            if (!currentUser) return;
+
+            const userRef = ref(database, 'users/' + currentUser.uid);
+            const newBalance = parseFloat((userData.balance + reward).toFixed(2));
+            const newLastClaimTime = Date.now();
+
+            try {
+                await update(userRef, {
+                    balance: newBalance,
+                    [`tasks/${taskId}/lastClaimTime`]: newLastClaimTime
+                });
+                userData.balance = newBalance; // Update local state
+                if (!userData.tasks) userData.tasks = {}; // Ensure tasks object exists
+                userData.tasks[taskId] = { lastClaimTime: newLastClaimTime }; // Update local state
+
+                alert(`অভিনন্দন! আপনি ৳ ${reward.toFixed(2)} পেয়েছেন!`);
+                showTaskBlockedState(card, taskId, 0); // Show blocked state immediately
+            } catch (error) {
+                console.error("টাস্ক ক্লেম করতে ব্যর্থ:", error);
+                alert('টাস্ক ক্লেম করতে সমস্যা হয়েছে।');
+            }
+        }
+
+        // --- User Activation Logic ---
+
+        // Function to start or resume the activation countdown
+        function startActivationCountdown() {
+            document.getElementById('joinTelegramBtn').style.display = 'none';
+            document.getElementById('activationCountdown').style.display = 'block';
+            document.getElementById('activateIdBtn').style.display = 'block'; // Show activate button but disabled
+            document.getElementById('activateIdBtn').disabled = true;
+            document.getElementById('activateIdBtn').classList.remove('active');
+
+            // Clear any existing countdown to prevent multiple timers
+            clearInterval(activationCountdownInterval);
+
+            let activationCountdownTime = 5; // 5 seconds countdown
+            const countdownDisplay = document.getElementById('activationCountdown');
+            countdownDisplay.innerText = activationCountdownTime;
+
+            activationCountdownInterval = setInterval(() => {
+                activationCountdownTime--;
+                countdownDisplay.innerText = activationCountdownTime;
+                if (activationCountdownTime <= 0) {
+                    clearInterval(activationCountdownInterval);
+                    countdownDisplay.innerText = '০'; // Display 0 when done
+                    document.getElementById('activateIdBtn').disabled = false;
+                    document.getElementById('activateIdBtn').classList.add('active');
+                }
+            }, 1000);
+        }
+
+        // Modify handleTelegramJoin
+        async function handleTelegramJoin() {
+            // Open Telegram link in a new tab
+            window.open('https://t.me/your_telegram_channel', '_blank');
+
+            // Update Firebase to mark that user has initiated the Telegram join process
+            if (currentUser) {
+                const userRef = ref(database, 'users/' + currentUser.uid);
+                try {
+                    await update(userRef, { hasJoinedTelegram: true });
+                    userData.hasJoinedTelegram = true; // Update local state immediately
+                } catch (error) {
+                    console.error("Failed to update hasJoinedTelegram in Firebase:", error);
+                    // Continue even if Firebase update fails, but log it
+                }
+            }
+            // Start the countdown immediately on the current page
+            startActivationCountdown();
+        }
+
+
+        function checkUserActivationStatus() {
+            if (userData.isActivated) {
+                document.getElementById('verifiedTick').classList.add('active');
+                hideActivationPopup(); // Ensure popup is hidden if activated
+                clearInterval(activationPopupInterval); // Stop recurring popup if user activates
+            } else {
+                document.getElementById('verifiedTick').classList.remove('active');
+                // If user is not activated but has initiated Telegram join process
+                if (userData.hasJoinedTelegram) {
+                    showActivationPopup(); // Show popup
+                    startActivationCountdown(); // Immediately start countdown
+                } else {
+                    // User not activated and has not initiated Telegram join
+                    // Only show the popup if it's not already visible.
+                    // This prevents showing it repeatedly if user closes it without action.
+                    if (document.getElementById('activationPopup').style.display !== 'flex') {
+                        showActivationPopup();
+                    }
+                    // Ensure the join button is visible and activate button is hidden/disabled
+                    document.getElementById('joinTelegramBtn').style.display = 'block';
+                    document.getElementById('activationCountdown').style.display = 'none';
+                    document.getElementById('activateIdBtn').style.display = 'none';
+                }
+                startRecurringActivationPopup(); // Start recurring popup if not activated
+            }
+        }
+
+        function showActivationPopup() {
+            document.getElementById('activationPopup').style.display = 'flex';
+            // This function will be called by checkUserActivationStatus, which sets the correct display states for buttons/countdown.
+            // So, no explicit display changes here, let checkUserActivationStatus handle it.
+        }
+
+        function hideActivationPopup() {
+            document.getElementById('activationPopup').style.display = 'none';
+            clearInterval(activationCountdownInterval); // Also clear activation specific countdown
+            if (userData.isActivated) {
+                clearInterval(activationPopupInterval); // Stop recurring popup if user activates
+            }
+        }
+
+        async function activateUser() {
+            if (!currentUser) return;
+
+            const userRef = ref(database, 'users/' + currentUser.uid);
+            try {
+                await update(userRef, { isActivated: true });
+                userData.isActivated = true; // Update local state
+                alert('আপনার আইডি সফলভাবে অ্যাক্টিভ করা হয়েছে! এখন আপনি মাইনিং এবং টাস্কগুলো ব্যবহার করতে পারবেন।');
+                hideActivationPopup(); // Hide popup immediately after activation
+                checkUserActivationStatus(); // This will also clear recurring interval
+            } catch (error) {
+                console.error("অ্যাক্টিভেশন ব্যর্থ:", error);
+                alert('অ্যাক্টিভেশন করতে সমস্যা হয়েছে।');
+            }
+        }
+
+        function startRecurringActivationPopup() {
+            if (activationPopupInterval) {
+                clearInterval(activationPopupInterval);
+            }
+            activationPopupInterval = setInterval(() => {
+                if (currentUser && !userData.isActivated && document.getElementById('activationPopup').style.display !== 'flex') {
+                    showActivationPopup();
+                }
+            }, 30 * 1000); // Every 30 seconds
+        }
+
+        // --- Logout ---
+        window.logoutUser = async function() {
+            try {
+                await signOut(auth);
+                // The onAuthStateChanged listener will handle redirection to registration.html
+            } catch (error) {
+                console.error("লগ আউট ব্যর্থ:", error);
+                alert("লগ আউট করতে সমস্যা হয়েছে।");
+            }
+        };
+
+        // Initial calls are handled by onAuthStateChanged listener
+    </script>
+</body>
+</html>
